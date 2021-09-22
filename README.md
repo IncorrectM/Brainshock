@@ -26,6 +26,8 @@ Brainfucked is backwards compatible with brainfuck: all brainfuck programs work 
 &emsp;"&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value of pp into stack.  
 &emsp;'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack and give it to pp.  
 &emsp;@&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Set the value pointed by mp to zero.  
+&emsp;{&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Start comment.
+&emsp;}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;End comment.
 ***
 All charactoer other than commands should be ignored as comments.  
 A simple implementation of Brainfucked is included in this repository.
