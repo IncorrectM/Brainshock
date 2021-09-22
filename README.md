@@ -19,7 +19,7 @@ Brainfucked is backwards compatible with brainfuck: all brainfuck programs work 
 &emsp;v&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Move mp up.  
 &emsp;=&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value pointed by mp into stack.  
 &emsp;~&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Give the value at the top of the stack to where the mp points at.  
-&emsp;*&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack. If mp is pointing at Dimension One, this command should not change the value where mp pointed at. If mp is pointing at Dimension Two, give the value to where mp points at.  
+&emsp;*&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack. Give the value to the position pointed by mp.
 &emsp;:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value of mp into stack.  
 &emsp;;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack and give it to mp.  
 &emsp;"&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value of pp into stack.  
