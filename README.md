@@ -26,8 +26,14 @@ Brainfucked is backwards compatible with brainfuck: all brainfuck programs work 
 &emsp;"&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value of pp into stack.  
 &emsp;'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack and give it to pp.  
 &emsp;@&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Set the value pointed by mp to zero.  
-&emsp;{&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Start comment.
-&emsp;}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;End comment.
+&emsp;{&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Start comment.  
+&emsp;}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;End comment.  
+Notice:  
+
+1. command ^ and v loop when upper(lower) bound is exeeded.
+2. unpaired { will cause exceptio will a single } will not.
+3. commands are interpreted one by one
+
 ***
 All charactoer other than commands should be ignored as comments.  
-A simple implementation of Brainfucked is included in this repository.
+A simple implementation of Brainfucked(Brainshocked) is included in this repository.
