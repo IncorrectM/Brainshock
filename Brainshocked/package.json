@@ -9,5 +9,8 @@
     "start": "node ./build/main.js -f ./default.bfd"
   },
   "author": "Zzh-dev",
-  "license": "GPL 3.0"
+  "license": "GPL 3.0",
+  "devDependencies": {
+    "@types/node": "^16.9.1"
+  }
 }
