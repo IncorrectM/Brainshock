@@ -1,7 +1,8 @@
-import { V4MAPPED } from "dns";
-import { exit } from "process";
-import { getSource } from "./source";
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.runBF = void 0;
+var process_1 = require("process");
+var source_1 = require("./source");
 /** Operators
  *  约定：指针特指内存指针
  *  >	指针右移一个元素
@@ -28,167 +29,153 @@ import { getSource } from "./source";
  *  @   将指针所指位置归零
  *  忽略不在此表中的其他字符
  */
-const OPERATORS: string[] = ["+", "-", "<", ">", ".", ",", "[", "]"];
-const INITIAL_LENGTH = 16;
-
-class BFDVirtualMachine {
-    private step: number = 0.5;
-
-    private leftComment: boolean = false;
-    private stack: number[] = new Array(0);
-    private memory: number[] = [];
-    private program: string = "";
-
-    private mp: number = 0; // memory pointer
-    private pp: number = 0; // program pointer
-
-    constructor(code: string) {
+var OPERATORS = ["+", "-", "<", ">", ".", ",", "[", "]"];
+var INITIAL_LENGTH = 16;
+var BFDVirtualMachine = /** @class */ (function () {
+    function BFDVirtualMachine(code) {
+        this.step = 0.5;
+        this.leftComment = false;
+        this.stack = new Array(0);
+        this.memory = [];
+        this.program = "";
+        this.mp = 0; // memory pointer
+        this.pp = 0; // program pointer
         this.memory = new Array(INITIAL_LENGTH);
-        for (let i = 0; i <= INITIAL_LENGTH - 1; i++) {
+        for (var i = 0; i <= INITIAL_LENGTH - 1; i++) {
             this.memory[i] = 0;
         }
         this.program = code;
     }
-
-
-    private pointedValue(): number {
+    BFDVirtualMachine.prototype.pointedValue = function () {
         return this.memory[this.mp];
-    }
-
-    private changeAt(pos: number, value: number) {
+    };
+    BFDVirtualMachine.prototype.changeAt = function (pos, value) {
         if (pos >= this.memory.length) {
-            console.log(`Error: ArrayIndexOutOfBonus: ${pos}.\n\tAt: ${this.pp} - ${this.program[this.pp]}`);
-            exit(-1);
-        } else {
+            console.log("Error: ArrayIndexOutOfBonus: " + pos + ".\n\tAt: " + this.pp + " - " + this.program[this.pp]);
+            process_1.exit(-1);
+        }
+        else {
             this.memory[pos] = value;
         }
-    }
-
-    private enlarge(): void {
-        const newLen = Math.floor(this.memory.length * this.step);
+    };
+    BFDVirtualMachine.prototype.enlarge = function () {
+        var newLen = Math.floor(this.memory.length * this.step);
         while (this.memory.length <= newLen) {
             this.memory.push(0);
         }
-    }
-
-    private nextMem(): void {
+    };
+    BFDVirtualMachine.prototype.nextMem = function () {
         if (this.mp >= this.memory.length) {
             this.enlarge();
             this.nextMem();
-        } else {
+        }
+        else {
             this.mp++;
         }
-    }
-
-    private previousMem(): void {
+    };
+    BFDVirtualMachine.prototype.previousMem = function () {
         if (this.mp == 0) {
-            console.log(`Error: ArrayIndexOutOfBonus: -1.\n\tAt: ${this.pp} - ${this.program[this.pp]}`);
-            exit(-1);
-        } else {
+            console.log("Error: ArrayIndexOutOfBonus: -1.\n\tAt: " + this.pp + " - " + this.program[this.pp]);
+            process_1.exit(-1);
+        }
+        else {
             this.mp--;
         }
-    }
-
-    private add(): void {
-        const curValue = this.pointedValue();
+    };
+    BFDVirtualMachine.prototype.add = function () {
+        var curValue = this.pointedValue();
         if (curValue >= 255) {
             this.changeAt(this.mp, 0);
-        } else {
+        }
+        else {
             this.changeAt(this.mp, curValue + 1);
         }
-    }
-
-    private sub(): void {
-        const curValue = this.pointedValue();
+    };
+    BFDVirtualMachine.prototype.sub = function () {
+        var curValue = this.pointedValue();
         if (curValue <= 0) {
             this.changeAt(this.mp, 255);
-        } else {
+        }
+        else {
             this.changeAt(this.mp, curValue - 1);
         }
-    }
-
-    public nextPrg(): string {
+    };
+    BFDVirtualMachine.prototype.nextPrg = function () {
         if (!this.hasNextPrg) {
-            console.log(`Error: Program Pointer out of bonus :${this.pp}.`);
-            exit(-1);
-        } else {
+            console.log("Error: Program Pointer out of bonus :" + this.pp + ".");
+            process_1.exit(-1);
+        }
+        else {
             this.pp++;
             return this.program[this.pp];
         }
-    }
-
-    public hasNextPrg(): boolean {
+    };
+    BFDVirtualMachine.prototype.hasNextPrg = function () {
         return this.pp < this.program.length;
-    }
-
-    private previousPrg(): void {
+    };
+    BFDVirtualMachine.prototype.previousPrg = function () {
         if (this.pp <= 0) {
-            console.log(`Error: Program Pointer out of bonus : No previous oeprator.`);
-            exit(-1);
-        } else {
+            console.log("Error: Program Pointer out of bonus : No previous oeprator.");
+            process_1.exit(-1);
+        }
+        else {
             this.pp--;
         }
-    }
-
-    private toPreviousLSquare(): void {
+    };
+    BFDVirtualMachine.prototype.toPreviousLSquare = function () {
         if (this.stack.length == 0) {
-            console.log(`No paired square bracket found: ${this.pp} - ${this.currentPrg()}`);
-            exit(-1);
-        } else {
-            const tmp = this.stack[this.stack.length - 1];
+            console.log("No paired square bracket found: " + this.pp + " - " + this.currentPrg());
+            process_1.exit(-1);
+        }
+        else {
+            var tmp = this.stack[this.stack.length - 1];
             // console.log(`\tJumped to ${tmp}`)
             this.pp = tmp - 1;
         }
-    }
-
-    private newLeftSquare(): void {
+    };
+    BFDVirtualMachine.prototype.newLeftSquare = function () {
         this.stack.push(this.pp + 1);
-    }
-
-    private newRightSquare(): void {
+    };
+    BFDVirtualMachine.prototype.newRightSquare = function () {
         if (this.pointedValue() != 0) {
             this.toPreviousLSquare();
-        } else {
+        }
+        else {
             // console.log(`\t Jump cancelled : ${this.pointedValue()}.`);
             this.stack.pop();
         }
-    }
-
-    private printCurrent(): void {
+    };
+    BFDVirtualMachine.prototype.printCurrent = function () {
         process.stdout.write(this.getCurrent());
-    }
-
-    private getCurrent(): string {
+    };
+    BFDVirtualMachine.prototype.getCurrent = function () {
         return String.fromCharCode(this.pointedValue());
-    }
-
-    private newLeftComment(): void {
+    };
+    BFDVirtualMachine.prototype.newLeftComment = function () {
         this.leftComment = true;
-    }
-
-    private closeComment(): void {
+    };
+    BFDVirtualMachine.prototype.closeComment = function () {
         this.leftComment = false;
-    }
-
-    public currentPrg(): string {
+    };
+    BFDVirtualMachine.prototype.currentPrg = function () {
         return this.program[this.pp];
-    }
-
-    public operate(opr: string): void {
+    };
+    BFDVirtualMachine.prototype.operate = function (opr) {
         // console.log(`\tOperator: ${opr}`)
         if (this.leftComment) {
             if (opr == "}") {
                 // end comment
-                // console.log(`\t "{" found, close comment`);
                 this.leftComment = false;
-            } else if (!this.hasNextPrg()) {
-                console.log(`Unexpected EOF: no '}' found after '{'.`);
-                exit(-1);
-            } else {
-                // console.log(`\thasNextPrg: ${this.hasNextPrg()}\n\tleftComment: ${this.leftComment}\n\tIgnored: ${opr}`);
+            }
+            else if (!this.hasNextPrg()) {
+                console.log("Unexpected EOF: no '}' found after '{'.");
+                process_1.exit(-1);
+            }
+            else {
                 // skip
             }
-        } else {
+        }
+        else {
             switch (opr) {
                 case "+":
                     this.add();
@@ -225,27 +212,24 @@ class BFDVirtualMachine {
                     break;
             }
         }
-    }
-
-    public reportStatus(num: number = 0) {
-        console.log(`${num} VirtualMachine\n\tStack: ${this.stack}\n\tMemort: ${this.memory}\n`);
-        // console.log(`\tProgram: ${this.program}`);
-        console.log(`\tleftComment: ${this.leftComment}`);
-        console.log(`\tPP: ${this.pp}\n\tMP: ${this.mp}`);
-        console.log(`\tCommand: ${this.currentPrg()}`);
-    }
-}
-
-function runBF(): void {
-    const vm = new BFDVirtualMachine(getSource());
-    let count = 0;
+    };
+    BFDVirtualMachine.prototype.reportStatus = function (num) {
+        if (num === void 0) { num = 0; }
+        console.log(num + " VirtualMachine\n\tStack: " + this.stack + "\n\tMemort: " + this.memory + "\n\tProgram: " + this.program);
+        console.log("\tPP: " + this.pp + "\n\tMP: " + this.mp);
+        console.log("\tCommand: " + this.currentPrg());
+    };
+    return BFDVirtualMachine;
+}());
+function runBF() {
+    var vm = new BFDVirtualMachine(source_1.getSource());
+    var count = 0;
     while (vm.hasNextPrg()) {
-        const opr: string = vm.currentPrg();
-        vm.nextPrg();
+        var opr = vm.currentPrg();
         vm.operate(opr);
-        // vm.reportStatus(count++);
+        vm.reportStatus(count++);
+        vm.nextPrg();
     }
     process.stdout.write("\n");
 }
-
-export { runBF };
+exports.runBF = runBF;
