@@ -30,49 +30,57 @@ import { getSource } from "./source";
  */
 const OPERATORS: string[] = ["+", "-", "<", ">", ".", ",", "[", "]"];
 const INITIAL_LENGTH = 16;
+const NUM_DIMENSION = 2;
 
 class BFDVirtualMachine {
     private step: number = 0.5;
 
     private leftComment: boolean = false;
-    private stack: number[] = new Array(0);
-    private memory: number[] = [];
+    private operatorStack: number[] = new Array(0);
+    private stack: number[] = [];
+
+    private memories: number[][] = new Array(NUM_DIMENSION);
+    private curMemory: number = 0;
     private program: string = "";
 
     private mp: number = 0; // memory pointer
     private pp: number = 0; // program pointer
 
     constructor(code: string) {
-        this.memory = new Array(INITIAL_LENGTH);
-        for (let i = 0; i <= INITIAL_LENGTH - 1; i++) {
-            this.memory[i] = 0;
+        for (let i = 0; i <= NUM_DIMENSION - 1; i++) {
+            this.memories[i] = new Array(INITIAL_LENGTH);
         }
+        this.memories.forEach(mem => {
+            for (let i = 0; i <= INITIAL_LENGTH - 1; i++) {
+                mem[i] = 0;
+            }
+        })
         this.program = code;
     }
 
 
     private pointedValue(): number {
-        return this.memory[this.mp];
+        return this.memories[this.curMemory][this.mp];
     }
 
     private changeAt(pos: number, value: number) {
-        if (pos >= this.memory.length) {
+        if (pos >= this.memories[this.curMemory].length) {
             console.log(`Error: ArrayIndexOutOfBonus: ${pos}.\n\tAt: ${this.pp} - ${this.program[this.pp]}`);
             exit(-1);
         } else {
-            this.memory[pos] = value;
+            this.memories[this.curMemory][pos] = value;
         }
     }
 
     private enlarge(): void {
-        const newLen = Math.floor(this.memory.length * this.step);
-        while (this.memory.length <= newLen) {
-            this.memory.push(0);
+        const newLen = Math.floor(this.memories[this.curMemory].length * this.step);
+        while (this.memories[this.curMemory].length <= newLen) {
+            this.memories[this.curMemory].push(0);
         }
     }
 
     private nextMem(): void {
-        if (this.mp >= this.memory.length) {
+        if (this.mp >= this.memories[this.curMemory].length) {
             this.enlarge();
             this.nextMem();
         } else {
@@ -131,18 +139,18 @@ class BFDVirtualMachine {
     }
 
     private toPreviousLSquare(): void {
-        if (this.stack.length == 0) {
+        if (this.operatorStack.length == 0) {
             console.log(`No paired square bracket found: ${this.pp} - ${this.currentPrg()}`);
             exit(-1);
         } else {
-            const tmp = this.stack[this.stack.length - 1];
+            const tmp = this.operatorStack[this.operatorStack.length - 1];
             // console.log(`\tJumped to ${tmp}`)
             this.pp = tmp - 1;
         }
     }
 
     private newLeftSquare(): void {
-        this.stack.push(this.pp + 1);
+        this.operatorStack.push(this.pp + 1);
     }
 
     private newRightSquare(): void {
@@ -150,7 +158,7 @@ class BFDVirtualMachine {
             this.toPreviousLSquare();
         } else {
             // console.log(`\t Jump cancelled : ${this.pointedValue()}.`);
-            this.stack.pop();
+            this.operatorStack.pop();
         }
     }
 
@@ -228,7 +236,7 @@ class BFDVirtualMachine {
     }
 
     public reportStatus(num: number = 0) {
-        console.log(`${num} VirtualMachine\n\tStack: ${this.stack}\n\tMemort: ${this.memory}\n`);
+        console.log(`${num} VirtualMachine\n\tStack: ${this.operatorStack}\n\tMemort: ${this.memories[this.curMemory]}\n`);
         // console.log(`\tProgram: ${this.program}`);
         console.log(`\tleftComment: ${this.leftComment}`);
         console.log(`\tPP: ${this.pp}\n\tMP: ${this.mp}`);

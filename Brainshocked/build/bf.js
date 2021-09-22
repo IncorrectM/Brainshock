@@ -31,41 +31,48 @@ var source_1 = require("./source");
  */
 var OPERATORS = ["+", "-", "<", ">", ".", ",", "[", "]"];
 var INITIAL_LENGTH = 16;
+var NUM_DIMENSION = 2;
 var BFDVirtualMachine = /** @class */ (function () {
     function BFDVirtualMachine(code) {
         this.step = 0.5;
         this.leftComment = false;
-        this.stack = new Array(0);
-        this.memory = [];
+        this.operatorStack = new Array(0);
+        this.stack = [];
+        this.memories = new Array(NUM_DIMENSION);
+        this.curMemory = 0;
         this.program = "";
         this.mp = 0; // memory pointer
         this.pp = 0; // program pointer
-        this.memory = new Array(INITIAL_LENGTH);
-        for (var i = 0; i <= INITIAL_LENGTH - 1; i++) {
-            this.memory[i] = 0;
+        for (var i = 0; i <= NUM_DIMENSION - 1; i++) {
+            this.memories[i] = new Array(INITIAL_LENGTH);
         }
+        this.memories.forEach(function (mem) {
+            for (var i = 0; i <= INITIAL_LENGTH - 1; i++) {
+                mem[i] = 0;
+            }
+        });
         this.program = code;
     }
     BFDVirtualMachine.prototype.pointedValue = function () {
-        return this.memory[this.mp];
+        return this.memories[this.curMemory][this.mp];
     };
     BFDVirtualMachine.prototype.changeAt = function (pos, value) {
-        if (pos >= this.memory.length) {
+        if (pos >= this.memories[this.curMemory].length) {
             console.log("Error: ArrayIndexOutOfBonus: " + pos + ".\n\tAt: " + this.pp + " - " + this.program[this.pp]);
             process_1.exit(-1);
         }
         else {
-            this.memory[pos] = value;
+            this.memories[this.curMemory][pos] = value;
         }
     };
     BFDVirtualMachine.prototype.enlarge = function () {
-        var newLen = Math.floor(this.memory.length * this.step);
-        while (this.memory.length <= newLen) {
-            this.memory.push(0);
+        var newLen = Math.floor(this.memories[this.curMemory].length * this.step);
+        while (this.memories[this.curMemory].length <= newLen) {
+            this.memories[this.curMemory].push(0);
         }
     };
     BFDVirtualMachine.prototype.nextMem = function () {
-        if (this.mp >= this.memory.length) {
+        if (this.mp >= this.memories[this.curMemory].length) {
             this.enlarge();
             this.nextMem();
         }
@@ -123,18 +130,18 @@ var BFDVirtualMachine = /** @class */ (function () {
         }
     };
     BFDVirtualMachine.prototype.toPreviousLSquare = function () {
-        if (this.stack.length == 0) {
+        if (this.operatorStack.length == 0) {
             console.log("No paired square bracket found: " + this.pp + " - " + this.currentPrg());
             process_1.exit(-1);
         }
         else {
-            var tmp = this.stack[this.stack.length - 1];
+            var tmp = this.operatorStack[this.operatorStack.length - 1];
             // console.log(`\tJumped to ${tmp}`)
             this.pp = tmp - 1;
         }
     };
     BFDVirtualMachine.prototype.newLeftSquare = function () {
-        this.stack.push(this.pp + 1);
+        this.operatorStack.push(this.pp + 1);
     };
     BFDVirtualMachine.prototype.newRightSquare = function () {
         if (this.pointedValue() != 0) {
@@ -142,7 +149,7 @@ var BFDVirtualMachine = /** @class */ (function () {
         }
         else {
             // console.log(`\t Jump cancelled : ${this.pointedValue()}.`);
-            this.stack.pop();
+            this.operatorStack.pop();
         }
     };
     BFDVirtualMachine.prototype.printCurrent = function () {
@@ -165,6 +172,7 @@ var BFDVirtualMachine = /** @class */ (function () {
         if (this.leftComment) {
             if (opr == "}") {
                 // end comment
+                // console.log(`\t "{" found, close comment`);
                 this.leftComment = false;
             }
             else if (!this.hasNextPrg()) {
@@ -172,6 +180,7 @@ var BFDVirtualMachine = /** @class */ (function () {
                 process_1.exit(-1);
             }
             else {
+                // console.log(`\thasNextPrg: ${this.hasNextPrg()}\n\tleftComment: ${this.leftComment}\n\tIgnored: ${opr}`);
                 // skip
             }
         }
@@ -215,7 +224,9 @@ var BFDVirtualMachine = /** @class */ (function () {
     };
     BFDVirtualMachine.prototype.reportStatus = function (num) {
         if (num === void 0) { num = 0; }
-        console.log(num + " VirtualMachine\n\tStack: " + this.stack + "\n\tMemort: " + this.memory + "\n\tProgram: " + this.program);
+        console.log(num + " VirtualMachine\n\tStack: " + this.operatorStack + "\n\tMemort: " + this.memories[this.curMemory] + "\n");
+        // console.log(`\tProgram: ${this.program}`);
+        console.log("\tleftComment: " + this.leftComment);
         console.log("\tPP: " + this.pp + "\n\tMP: " + this.mp);
         console.log("\tCommand: " + this.currentPrg());
     };
@@ -226,9 +237,9 @@ function runBF() {
     var count = 0;
     while (vm.hasNextPrg()) {
         var opr = vm.currentPrg();
-        vm.operate(opr);
-        vm.reportStatus(count++);
         vm.nextPrg();
+        vm.operate(opr);
+        // vm.reportStatus(count++);
     }
     process.stdout.write("\n");
 }

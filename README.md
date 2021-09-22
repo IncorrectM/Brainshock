@@ -12,7 +12,6 @@ As well as memory cells, Brainfucked has a tiny stack which contains nothing ini
 
 ## Commands
 
-***
 Brainfucked is backwards compatible with brainfuck: all brainfuck programs work just the same in brainfucked. The command set is the same as brainfuck's, with addition of the following:  
 ***
 **Command** &emsp;&emsp; **Description**  
