@@ -1,17 +1,17 @@
-# Brainfucked
+# Brainshock
 
-Brainfucked is a Brainfuck extension by zzhdev. It's Brainfuck with stack and 2-Dimensional memories.  
+Brainshock is a Brainfuck extension by zzhdev. It's Brainfuck with stack and 2-Dimensional memories.  
 ***
 
 ## Overview
 
-Brainfucked operates two arrays of memory cells, each initially set to zero. There is one pointer pointing at the first element of the fisrt array of memeory cells.  
-As well as memory cells, Brainfucked has a tiny stack which contains nothing initially.
+Brainshock operates two arrays of memory cells, each initially set to zero. There is one pointer pointing at the first element of the fisrt array of memeory cells.  
+As well as memory cells, Brainshock has a tiny stack which contains nothing initially.
 ***
 
 ## Commands
 
-Brainfucked is backwards compatible with brainfuck: all brainfuck programs work just the same in brainfucked. The command set is the same as brainfuck's, with addition of the following:  
+Brainshock is backwards compatible with brainfuck: all brainfuck programs work just the same in Brainshock. The command set is the same as brainfuck's, with addition of the following:  
 ***
 **Command** &emsp;&emsp; **Description**  
 &emsp;^&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Move mp down.  
@@ -35,4 +35,4 @@ Notice:
 
 ***
 All charactoer other than commands should be ignored as comments.  
-A simple implementation of Brainfucked(Brainshocked) is included in this repository.
+A simple implementation of Brainshock(Brainshocked) is included in this repository.

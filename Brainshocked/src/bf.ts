@@ -39,7 +39,7 @@ const INITIAL_LENGTH = 16;
 const NUM_DIMENSION = 2;
 
 let stdoutVM = console.log;
-class BFDVirtualMachine {
+class BSVirtualMachine {
     private step: number = 0.5;
 
     private leftComment: boolean = false;
@@ -319,8 +319,8 @@ class BFDVirtualMachine {
     }
 }
 
-function runBF(): void {
-    const vm = new BFDVirtualMachine(getSource());
+function runBS(): void {
+    const vm = new BSVirtualMachine(getSource());
     let count = 0;
     while (vm.hasNextPrg()) {
         const opr: string = vm.currentPrg();
@@ -331,4 +331,4 @@ function runBF(): void {
     process.stdout.write("\n");
 }
 
-export { runBF };
+export { runBS as runBF };
