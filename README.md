@@ -1,6 +1,6 @@
 # Brainshock
 
-Brainshock is a Brainfuck extension by zzhdev. It's Brainfuck with stack and 2-Dimensional memories.  
+Brainshock is a Brainfuck extension by zzhdev. It's Brainfuck with stack and Multi-Dimensional memories.  
 ***
 
 ## Overview
