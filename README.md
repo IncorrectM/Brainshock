@@ -1,7 +1,6 @@
 # Brainfucked
 
 Brainfucked is a Brainfuck extension by zzhdev. It's Brainfuck with stack and 2-Dimensional memories.  
-Multi-thread support is under discussion.
 ***
 
 ## Overview
@@ -25,13 +24,14 @@ Brainfucked is backwards compatible with brainfuck: all brainfuck programs work 
 &emsp;"&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value of pp into stack.  
 &emsp;'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack and give it to pp.  
 &emsp;@&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Set the value pointed by mp to zero.  
-&emsp;{&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Start comment.  
-&emsp;}&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;End comment.  
+&emsp;(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Start comment.  
+&emsp;)&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;End comment.  
 Notice:  
 
 1. command ^ and v loop when upper(lower) bound is exeeded.
-2. unpaired { will cause exceptio will a single } will not.
-3. commands are interpreted one by one
+2. unpaired ( will cause exceptio will a single ) will not.
+3. commands are interpreted one by one.
+4. command = won't push the value of dimension.  
 
 ***
 All charactoer other than commands should be ignored as comments.  

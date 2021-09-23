@@ -15,10 +15,11 @@ import { getSource } from "./source";
  *  ^   指针上移
  *  v   指针下移
  *  当 ^(v) 到达 上(下)界， mp会循环
- *  {   注释起点
- *  }   注释重点
- *  当 { 出现而 } 未出现时会报错， 而当单独的 } 出现时不会
+ *  (   注释起点
+ *  )   注释重点
+ *  当 ( 出现而 ) 未出现时会报错， 而当单独的 ) 出现时不会
  *  =   将当前指针指向位置压入栈中
+ *  压入值不包括维度值
  *  ~   将栈顶赋值给指针指向位置
  *  *   弹出栈顶值，并将其赋予指针所指位置
  *  :   将指针的值压入栈中
@@ -185,12 +186,14 @@ class BFDVirtualMachine {
     public operate(opr: string): void {
         // console.log(`\tOperator: ${opr}`)
         if (this.leftComment) {
-            if (opr == "}") {
+            if (opr == ")") {
                 // end comment
                 // console.log(`\t "{" found, close comment`);
                 this.leftComment = false;
             } else if (!this.hasNextPrg()) {
-                console.log(`Unexpected EOF: no '}' found after '{'.`);
+                console.log("\n");
+                console.log(`Unexpected EOF: no ')' found after '('.\nDetailed infomation:`);
+                this.reportStatus();
                 exit(-1);
             } else {
                 // console.log(`\thasNextPrg: ${this.hasNextPrg()}\n\tleftComment: ${this.leftComment}\n\tIgnored: ${opr}`);
@@ -222,10 +225,10 @@ class BFDVirtualMachine {
                 case ",":
                     // TODO: 赋值
                     break;
-                case "{":
+                case "(":
                     this.newLeftComment();
                     break;
-                case "}":
+                case ")":
                     this.closeComment();
                     break;
                 default:
@@ -236,7 +239,7 @@ class BFDVirtualMachine {
     }
 
     public reportStatus(num: number = 0) {
-        console.log(`${num} VirtualMachine\n\tStack: ${this.operatorStack}\n\tMemort: ${this.memories[this.curMemory]}\n`);
+        console.log(`${num} VirtualMachine\n\tStack: ${this.operatorStack}\n\tCurrent Memory: ${this.memories[this.curMemory]}\n`);
         // console.log(`\tProgram: ${this.program}`);
         console.log(`\tleftComment: ${this.leftComment}`);
         console.log(`\tPP: ${this.pp}\n\tMP: ${this.mp}`);
