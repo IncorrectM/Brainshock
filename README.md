@@ -13,19 +13,21 @@ As well as memory cells, Brainshock has a tiny stack which contains nothing init
 
 Brainshock is backwards compatible with brainfuck: all brainfuck programs work just the same in Brainshock. The command set is the same as brainfuck's, with addition of the following:  
 ***
-**Command** &emsp;&emsp; **Description**  
-&emsp;^&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Move mp down.  
-&emsp;v&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Move mp up.  
-&emsp;=&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value pointed by mp into stack.  
-&emsp;~&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Give the value at the top of the stack to where the mp points at.  
-&emsp;*&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack. Give the value to the position pointed by mp.
-&emsp;:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value of mp into stack.  
-&emsp;;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack and give it to mp.  
-&emsp;"&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Push the value of pp into stack.  
-&emsp;'&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pop the value at the top of the stack and give it to pp.  
-&emsp;@&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Set the value pointed by mp to zero.  
-&emsp;(&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Start comment.  
-&emsp;)&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;End comment.  
+|***Command***|***Description***|
+|     ----    |       ----      |
+|^            |Move mp down.  |
+|v            |Move mp up.  |
+|=            |Push the value pointed by mp into stack.  |
+|~            |Give the value at the top of the stack to where the mp points at.  |
+|*            |Pop the value at the top of the stack. Give the value to the position pointed by mp.|
+|:            |Push the value of mp into stack.  |
+|;            |Pop the value at the top of the stack and give it to mp.  |
+|"            |Push the value of pp into stack.  |
+|'            |Pop the value at the top of the stack and give it to pp.  |
+|@            |Set the value pointed by mp to zero.  |
+|(            |Start comment.  |
+|)            |End comment.|
+
 Notice:  
 
 1. command ^ and v loop when upper(lower) bound is exeeded.
