@@ -1,3 +1,4 @@
 Brainshocked/*.bf
 Brainshocked/*.bfd
 Brainshocked/node_modules
+Brainshocked/build/
