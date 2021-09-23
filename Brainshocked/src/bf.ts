@@ -1,4 +1,3 @@
-import { V4MAPPED } from "dns";
 import { exit } from "process";
 import { getSource } from "./source";
 
@@ -39,6 +38,7 @@ const OPERATORS: string[] = ["+", "-", "<", ">", ".", ",", "[", "]"];
 const INITIAL_LENGTH = 16;
 const NUM_DIMENSION = 2;
 
+let stdoutVM = console.log;
 class BFDVirtualMachine {
     private step: number = 0.5;
 
@@ -72,7 +72,7 @@ class BFDVirtualMachine {
 
     private changeAt(pos: number, value: number) {
         if (pos >= this.memories[this.curMemory].length) {
-            console.log(`Error: ArrayIndexOutOfBonus: ${pos}.\n\tAt: ${this.pp - 1} - ${this.program[this.pp]}`);
+            stdoutVM(`Error: ArrayIndexOutOfBonus: ${pos}.\n\tAt: ${this.pp - 1} - ${this.program[this.pp]}`);
             exit(-1);
         } else {
             this.memories[this.curMemory][pos] = value;
@@ -97,7 +97,7 @@ class BFDVirtualMachine {
 
     private previousMem(): void {
         if (this.mp == 0) {
-            console.log(`Error: ArrayIndexOutOfBonus: -1.\n\tAt: ${this.pp - 1} - ${this.program[this.pp]}`);
+            stdoutVM(`Error: ArrayIndexOutOfBonus: -1.\n\tAt: ${this.pp - 1} - ${this.program[this.pp]}`);
             exit(-1);
         } else {
             this.mp--;
@@ -128,7 +128,7 @@ class BFDVirtualMachine {
 
     public nextPrg(): string {
         if (!this.hasNextPrg) {
-            console.log(`Error: Program Pointer out of bonus :${this.pp - 1}.`);
+            stdoutVM(`Error: Program Pointer out of bonus :${this.pp - 1}.`);
             exit(-1);
         } else {
             this.pp++;
@@ -142,7 +142,7 @@ class BFDVirtualMachine {
 
     private previousPrg(): void {
         if (this.pp <= 0) {
-            console.log(`Error: Program Pointer out of bonus : No previous oeprator.`);
+            stdoutVM(`Error: Program Pointer out of bonus : No previous oeprator.`);
             exit(-1);
         } else {
             this.pp--;
@@ -151,7 +151,7 @@ class BFDVirtualMachine {
 
     private toPreviousLSquare(): void {
         if (this.operatorStack.length == 0) {
-            console.log(`No paired square bracket found: ${this.pp - 1} - ${this.currentPrg()}`);
+            stdoutVM(`No paired square bracket found: ${this.pp - 1} - ${this.currentPrg()}`);
             exit(-1);
         } else {
             const tmp = this.operatorStack[this.operatorStack.length - 1];
@@ -161,7 +161,7 @@ class BFDVirtualMachine {
     }
 
     private newLeftSquare(): void {
-        this.operatorStack.push(this.pp);
+        this.operatorStack.push(this.pp + 1);
     }
 
     private newRightSquare(): void {
@@ -215,8 +215,8 @@ class BFDVirtualMachine {
                 // console.log(`\t "{" found, close comment`);
                 this.leftComment = false;
             } else if (!this.hasNextPrg()) {
-                console.log("\n");
-                console.log(`Unexpected EOF: no ')' found after '('.\nDetailed infomation:`);
+                stdoutVM("\n");
+                stdoutVM(`Unexpected EOF: no ')' found after '('.\nDetailed infomation:`);
                 this.reportStatus();
                 exit(-1);
             } else {
@@ -272,11 +272,11 @@ class BFDVirtualMachine {
     }
 
     public reportStatus(num: number = 0) {
-        console.log(`${num} VirtualMachine\n\tStack: ${this.operatorStack}\n\tCurrent Memory: ${this.memories[this.curMemory]}\n`);
-        // console.log(`\tProgram: ${this.program}`);
-        console.log(`\tleftComment: ${this.leftComment}`);
-        console.log(`\tPP: ${this.pp}\n\tMP: ${this.mp}`);
-        console.log(`\tCommand: ${this.currentPrg()}`);
+        stdoutVM(`${num} VirtualMachine\n\tStack: ${this.operatorStack}\n\tCurrent Memory: ${this.memories[this.curMemory]}\n`);
+        // VM_STDOUT(`\tProgram: ${this.program}`);
+        stdoutVM(`\tleftComment: ${this.leftComment}`);
+        stdoutVM(`\tPP: ${this.pp}\n\tMP: ${this.mp}`);
+        stdoutVM(`\tCommand: ${this.currentPrg()}`);
     }
 }
 

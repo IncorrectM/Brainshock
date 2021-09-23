@@ -13,25 +13,33 @@ var source_1 = require("./source");
  *  ,	输入字符的ASCII码值到指针所指元素 暂未实现
  *  [	若指针所指元素为0，则跳转到对应']'处继续执行
  *  ]	若指针所指元素不为0，则跳转至对应'['处继续执行
+ *
  *  ^   指针上移
  *  v   指针下移
- *  当 ^(v) 到达 上(下)界， mp会循环
- *  {   注释起点
- *  }   注释重点
- *  当 { 出现而 } 未出现时会报错， 而当单独的 } 出现时不会
+ *      当 ^(v) 到达 上(下)界， mp会循环
+ *
+ *  (   注释起点
+ *  )   注释终点
+ *  当 ( 出现而 ) 未出现时会报错， 而当单独的 ) 出现时不会
+ *
  *  =   将当前指针指向位置压入栈中
  *  ~   将栈顶赋值给指针指向位置
  *  *   弹出栈顶值，并将其赋予指针所指位置
+ *
  *  :   将指针的值压入栈中
+ *      压入值不包括维度值
  *  ;   弹出栈顶值并赋予指针
+ *
  *  "   将程序指针的值压入栈中
  *  '   弹出栈顶值并赋予程序指针
+ *
  *  @   将指针所指位置归零
  *  忽略不在此表中的其他字符
  */
 var OPERATORS = ["+", "-", "<", ">", ".", ",", "[", "]"];
 var INITIAL_LENGTH = 16;
 var NUM_DIMENSION = 2;
+var stdoutVM = console.log;
 var BFDVirtualMachine = /** @class */ (function () {
     function BFDVirtualMachine(code) {
         this.step = 0.5;
@@ -58,7 +66,7 @@ var BFDVirtualMachine = /** @class */ (function () {
     };
     BFDVirtualMachine.prototype.changeAt = function (pos, value) {
         if (pos >= this.memories[this.curMemory].length) {
-            console.log("Error: ArrayIndexOutOfBonus: " + pos + ".\n\tAt: " + this.pp + " - " + this.program[this.pp]);
+            stdoutVM("Error: ArrayIndexOutOfBonus: " + pos + ".\n\tAt: " + (this.pp - 1) + " - " + this.program[this.pp]);
             process_1.exit(-1);
         }
         else {
@@ -82,7 +90,7 @@ var BFDVirtualMachine = /** @class */ (function () {
     };
     BFDVirtualMachine.prototype.previousMem = function () {
         if (this.mp == 0) {
-            console.log("Error: ArrayIndexOutOfBonus: -1.\n\tAt: " + this.pp + " - " + this.program[this.pp]);
+            stdoutVM("Error: ArrayIndexOutOfBonus: -1.\n\tAt: " + (this.pp - 1) + " - " + this.program[this.pp]);
             process_1.exit(-1);
         }
         else {
@@ -107,9 +115,12 @@ var BFDVirtualMachine = /** @class */ (function () {
             this.changeAt(this.mp, curValue - 1);
         }
     };
+    BFDVirtualMachine.prototype.setPointed = function (value) {
+        this.memories[this.curMemory][this.mp] = Math.abs(value) % 255;
+    };
     BFDVirtualMachine.prototype.nextPrg = function () {
         if (!this.hasNextPrg) {
-            console.log("Error: Program Pointer out of bonus :" + this.pp + ".");
+            stdoutVM("Error: Program Pointer out of bonus :" + (this.pp - 1) + ".");
             process_1.exit(-1);
         }
         else {
@@ -122,7 +133,7 @@ var BFDVirtualMachine = /** @class */ (function () {
     };
     BFDVirtualMachine.prototype.previousPrg = function () {
         if (this.pp <= 0) {
-            console.log("Error: Program Pointer out of bonus : No previous oeprator.");
+            stdoutVM("Error: Program Pointer out of bonus : No previous oeprator.");
             process_1.exit(-1);
         }
         else {
@@ -131,7 +142,7 @@ var BFDVirtualMachine = /** @class */ (function () {
     };
     BFDVirtualMachine.prototype.toPreviousLSquare = function () {
         if (this.operatorStack.length == 0) {
-            console.log("No paired square bracket found: " + this.pp + " - " + this.currentPrg());
+            stdoutVM("No paired square bracket found: " + (this.pp - 1) + " - " + this.currentPrg());
             process_1.exit(-1);
         }
         else {
@@ -164,19 +175,33 @@ var BFDVirtualMachine = /** @class */ (function () {
     BFDVirtualMachine.prototype.closeComment = function () {
         this.leftComment = false;
     };
+    BFDVirtualMachine.prototype.dimensionUp = function () {
+        this.curMemory--;
+        if (this.curMemory < 0) {
+            this.curMemory = this.memories.length - 1;
+        }
+    };
+    BFDVirtualMachine.prototype.dimensionDown = function () {
+        this.curMemory++;
+        if (this.curMemory >= this.memories.length) {
+            this.curMemory = 0;
+        }
+    };
     BFDVirtualMachine.prototype.currentPrg = function () {
         return this.program[this.pp];
     };
     BFDVirtualMachine.prototype.operate = function (opr) {
         // console.log(`\tOperator: ${opr}`)
         if (this.leftComment) {
-            if (opr == "}") {
+            if (opr == ")") {
                 // end comment
                 // console.log(`\t "{" found, close comment`);
                 this.leftComment = false;
             }
             else if (!this.hasNextPrg()) {
-                console.log("Unexpected EOF: no '}' found after '{'.");
+                stdoutVM("\n");
+                stdoutVM("Unexpected EOF: no ')' found after '('.\nDetailed infomation:");
+                this.reportStatus();
                 process_1.exit(-1);
             }
             else {
@@ -210,11 +235,20 @@ var BFDVirtualMachine = /** @class */ (function () {
                 case ",":
                     // TODO: 赋值
                     break;
-                case "{":
+                case "(":
                     this.newLeftComment();
                     break;
-                case "}":
+                case ")":
                     this.closeComment();
+                    break;
+                case "^":
+                    this.dimensionUp();
+                    break;
+                case "v":
+                    this.dimensionDown();
+                    break;
+                case "@":
+                    this.setPointed(0);
                     break;
                 default:
                     // 跳过不在表内的字符
@@ -224,11 +258,11 @@ var BFDVirtualMachine = /** @class */ (function () {
     };
     BFDVirtualMachine.prototype.reportStatus = function (num) {
         if (num === void 0) { num = 0; }
-        console.log(num + " VirtualMachine\n\tStack: " + this.operatorStack + "\n\tMemort: " + this.memories[this.curMemory] + "\n");
-        // console.log(`\tProgram: ${this.program}`);
-        console.log("\tleftComment: " + this.leftComment);
-        console.log("\tPP: " + this.pp + "\n\tMP: " + this.mp);
-        console.log("\tCommand: " + this.currentPrg());
+        stdoutVM(num + " VirtualMachine\n\tStack: " + this.operatorStack + "\n\tCurrent Memory: " + this.memories[this.curMemory] + "\n");
+        // VM_STDOUT(`\tProgram: ${this.program}`);
+        stdoutVM("\tleftComment: " + this.leftComment);
+        stdoutVM("\tPP: " + this.pp + "\n\tMP: " + this.mp);
+        stdoutVM("\tCommand: " + this.currentPrg());
     };
     return BFDVirtualMachine;
 }());
