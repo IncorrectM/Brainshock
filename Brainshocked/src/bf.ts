@@ -12,20 +12,26 @@ import { getSource } from "./source";
  *  ,	输入字符的ASCII码值到指针所指元素 暂未实现
  *  [	若指针所指元素为0，则跳转到对应']'处继续执行
  *  ]	若指针所指元素不为0，则跳转至对应'['处继续执行
+ * 
  *  ^   指针上移
  *  v   指针下移
- *  当 ^(v) 到达 上(下)界， mp会循环
+ *      当 ^(v) 到达 上(下)界， mp会循环
+ * 
  *  (   注释起点
- *  )   注释重点
+ *  )   注释终点
  *  当 ( 出现而 ) 未出现时会报错， 而当单独的 ) 出现时不会
+ * 
  *  =   将当前指针指向位置压入栈中
- *  压入值不包括维度值
  *  ~   将栈顶赋值给指针指向位置
  *  *   弹出栈顶值，并将其赋予指针所指位置
+ * 
  *  :   将指针的值压入栈中
+ *      压入值不包括维度值
  *  ;   弹出栈顶值并赋予指针
+ * 
  *  "   将程序指针的值压入栈中
  *  '   弹出栈顶值并赋予程序指针
+ * 
  *  @   将指针所指位置归零
  *  忽略不在此表中的其他字符
  */
@@ -66,7 +72,7 @@ class BFDVirtualMachine {
 
     private changeAt(pos: number, value: number) {
         if (pos >= this.memories[this.curMemory].length) {
-            console.log(`Error: ArrayIndexOutOfBonus: ${pos}.\n\tAt: ${this.pp} - ${this.program[this.pp]}`);
+            console.log(`Error: ArrayIndexOutOfBonus: ${pos}.\n\tAt: ${this.pp - 1} - ${this.program[this.pp]}`);
             exit(-1);
         } else {
             this.memories[this.curMemory][pos] = value;
@@ -91,7 +97,7 @@ class BFDVirtualMachine {
 
     private previousMem(): void {
         if (this.mp == 0) {
-            console.log(`Error: ArrayIndexOutOfBonus: -1.\n\tAt: ${this.pp} - ${this.program[this.pp]}`);
+            console.log(`Error: ArrayIndexOutOfBonus: -1.\n\tAt: ${this.pp - 1} - ${this.program[this.pp]}`);
             exit(-1);
         } else {
             this.mp--;
@@ -116,9 +122,13 @@ class BFDVirtualMachine {
         }
     }
 
+    private setPointed(value: number) {
+        this.memories[this.curMemory][this.mp] = Math.abs(value) % 255;
+    }
+
     public nextPrg(): string {
         if (!this.hasNextPrg) {
-            console.log(`Error: Program Pointer out of bonus :${this.pp}.`);
+            console.log(`Error: Program Pointer out of bonus :${this.pp - 1}.`);
             exit(-1);
         } else {
             this.pp++;
@@ -141,7 +151,7 @@ class BFDVirtualMachine {
 
     private toPreviousLSquare(): void {
         if (this.operatorStack.length == 0) {
-            console.log(`No paired square bracket found: ${this.pp} - ${this.currentPrg()}`);
+            console.log(`No paired square bracket found: ${this.pp - 1} - ${this.currentPrg()}`);
             exit(-1);
         } else {
             const tmp = this.operatorStack[this.operatorStack.length - 1];
@@ -151,7 +161,7 @@ class BFDVirtualMachine {
     }
 
     private newLeftSquare(): void {
-        this.operatorStack.push(this.pp + 1);
+        this.operatorStack.push(this.pp);
     }
 
     private newRightSquare(): void {
@@ -250,6 +260,9 @@ class BFDVirtualMachine {
                     break;
                 case "v":
                     this.dimensionDown();
+                    break;
+                case "@":
+                    this.setPointed(0);
                     break;
                 default:
                     // 跳过不在表内的字符
