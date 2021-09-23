@@ -28,8 +28,8 @@ import { getSource } from "./source";
  *      压入值不包括维度值
  *  ;   弹出栈顶值并赋予指针
  * 
- *  "   将程序指针的值压入栈中
- *  '   弹出栈顶值并赋予程序指针
+ *  _   将程序指针的值压入栈中
+ *  #   弹出栈顶值并赋予程序指针
  * 
  *  @   将指针所指位置归零
  *  忽略不在此表中的其他字符
@@ -123,7 +123,7 @@ class BFDVirtualMachine {
     }
 
     private setPointed(value: number) {
-        this.memories[this.curMemory][this.mp] = Math.abs(value) % 255;
+        this.memories[this.curMemory][this.mp] = Math.abs(value) % 256;
     }
 
     public nextPrg(): string {
@@ -203,6 +203,24 @@ class BFDVirtualMachine {
         }
     }
 
+    private stackPush(value: number) {
+        this.stack.push(value);
+    }
+
+    private stackPop(): number {
+        const result = this.stack.pop();
+        if (result != undefined) {
+            return result;
+        } else {
+            stdoutVM(`Error: popping an empty stack at ${this.pp - 1}`);
+            exit(-1);
+        }
+    }
+
+    private stackTop(): number {
+        return this.stack[this.stack.length - 1];
+    }
+
     public currentPrg(): string {
         return this.program[this.pp];
     }
@@ -264,6 +282,27 @@ class BFDVirtualMachine {
                 case "@":
                     this.setPointed(0);
                     break;
+                case "_":
+                    this.stackPush(this.pp);
+                    break;
+                case "#":
+                    this.pp = this.stackPop();
+                    break;
+                case ":":
+                    this.stackPush(this.mp);
+                    break;
+                case ";":
+                    this.mp = this.stackPop();
+                    break;
+                case "=":
+                    this.stackPush(this.pointedValue());
+                    break;
+                case "~":
+                    this.setPointed(this.stackTop());
+                    break;
+                case "*":
+                    this.setPointed(this.stackPop());
+                    break;
                 default:
                     // 跳过不在表内的字符
                     break;
@@ -272,7 +311,7 @@ class BFDVirtualMachine {
     }
 
     public reportStatus(num: number = 0) {
-        stdoutVM(`${num} VirtualMachine\n\tStack: ${this.operatorStack}\n\tCurrent Memory: ${this.memories[this.curMemory]}\n`);
+        stdoutVM(`${num} VirtualMachine\n\tStack: ${this.stack}\n\tOperator Stack: ${this.operatorStack}\n\tCurrent Memory: ${this.memories[this.curMemory]}\n`);
         // VM_STDOUT(`\tProgram: ${this.program}`);
         stdoutVM(`\tleftComment: ${this.leftComment}`);
         stdoutVM(`\tPP: ${this.pp}\n\tMP: ${this.mp}`);
