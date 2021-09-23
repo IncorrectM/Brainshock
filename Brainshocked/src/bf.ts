@@ -179,6 +179,20 @@ class BFDVirtualMachine {
         this.leftComment = false;
     }
 
+    private dimensionUp(): void {
+        this.curMemory--;
+        if (this.curMemory < 0) {
+            this.curMemory = this.memories.length - 1;
+        }
+    }
+
+    private dimensionDown(): void {
+        this.curMemory++;
+        if (this.curMemory >= this.memories.length) {
+            this.curMemory = 0;
+        }
+    }
+
     public currentPrg(): string {
         return this.program[this.pp];
     }
@@ -230,6 +244,12 @@ class BFDVirtualMachine {
                     break;
                 case ")":
                     this.closeComment();
+                    break;
+                case "^":
+                    this.dimensionUp();
+                    break;
+                case "v":
+                    this.dimensionDown();
                     break;
                 default:
                     // 跳过不在表内的字符
