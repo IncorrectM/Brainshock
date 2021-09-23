@@ -11,20 +11,20 @@ As well as memory cells, Brainshock has a tiny stack which contains nothing init
 
 ## Commands
 
-Brainshock is backwards compatible with brainfuck: all brainfuck programs work just the same in Brainshock. The command set is the same as brainfuck's, with addition of the following:  
+Brainshock is backwards compatible with Brainfuck: all Brainfuck programs work just the same in Brainshock. The command set is the same as brainfuck's, with addition of the following:  
 ***
 |***Command***|***Description***|
 |     ----    |       ----      |
-|^            |Move mp down.  |
-|v            |Move mp up.  |
-|=            |Push the value pointed by mp into stack.  |
-|~            |Give the value at the top of the stack to where the mp points at.  |
-|*            |Pop the value at the top of the stack. Give the value to the position pointed by mp.|
-|:            |Push the value of mp into stack.  |
-|;            |Pop the value at the top of the stack and give it to mp.  |
-|"            |Push the value of pp into stack.  |
-|'            |Pop the value at the top of the stack and give it to pp.  |
-|@            |Set the value pointed by mp to zero.  |
+|^            |Move ```mp``` down.  |
+|v            |Move ```mp``` up.  |
+|=            |Push the value pointed by ```mp``` into stack.  |
+|~            |Give the value at the top of the stack to where ```mp``` points at.  |
+|*            |Pop the value at the top of the stack. Give the value to the position pointed by ```mp```.|
+|:            |Push the value of ```mp``` into stack.  |
+|;            |Pop the value at the top of the stack and give it to ```mp```.  |
+|"            |Push the value of ```pp``` into stack.  |
+|'            |Pop the value at the top of the stack and give it to ```pp```.  |
+|@            |Set the value pointed by ```mp``` to zero.  |
 |(            |Start comment.  |
 |)            |End comment.|
 
